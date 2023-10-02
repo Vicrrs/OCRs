@@ -62,8 +62,8 @@ def process_image(image_path):
         file.write("\n".join(text_easy))
 
 def postprocess_text(text):
-    # Remova caracteres não alfanuméricos
-    text = re.sub(r'[^A-Za-z0-9]', '', text)
+    # Remova caracteres não alfanuméricos e converta para maiúsculas
+    text = re.sub(r'[^A-Za-z0-9]', '', text).upper()
 
     # Se o texto for mais curto que 7 caracteres, retorne vazio
     if len(text) < 7:

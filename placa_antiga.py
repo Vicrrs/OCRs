@@ -6,11 +6,11 @@ import re
 from scripts.preprocessing import *
 
 # Pasta de entrada com as imagens
-input_folder = r"/media/vicrrs/Novo volume/CILIA/IMAGENS_PLACA/warped-with-errors-v1.1/antigo-v1"
+input_folder = r"/home/tkroza/Downloads/warped-with-errors-v1.1/antigo-v1"
 # Pasta para salvar os resultados do pytesseract
-pytesseract_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/teste_py"
+pytesseract_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/tesseract"
 # Pasta para salvar os resultados do easyocr
-easyocr_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/teste_easy"
+easyocr_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/easy"
 
 # Lista de idiomas desejados para o easyocr
 easyocr_lang_list = ['pt']
@@ -31,6 +31,20 @@ mapeamento = {
     '8': 'B',
     '9': 'P'
 }
+
+
+def extract_plate_from_text(text):
+    # Remove caracteres especiais da string
+    cleaned_text = re.sub(r'[-;:.]', '', text)
+    
+    # Procura o padrão da placa (3 letras seguidas por 4 números)
+    match = re.search(r'([A-Za-z]{3}\d{4})', cleaned_text)
+    
+    if match:
+        return match.group(1).upper()  # Converte para maiúsculas
+    else:
+        return ""
+
 
 # Função para substituir números por letras e letras por números
 def substituir_caracteres(caractere):
@@ -63,11 +77,13 @@ def process_image(image_path):
 
     # Realiza OCR com pytesseract e easyocr
     text_py = ocr_plate(img_blur)  # Você pode escolher entre img_gray e img_blur
+    text_py = extract_plate_from_text(text_py)
     
     # Use pytesseract para filtrar apenas os caracteres permitidos
     text_py = re.sub(f"[^{allowed_characters}]", "", text_py)
 
     text_easy = ocr_with_easyocr(img_blur)  # Você pode escolher entre img_gray e img_blur
+    text_easy = [extract_plate_from_text(t) for t in text_easy]
 
     # Filtrar apenas os caracteres permitidos no texto do easyocr
     text_easy = [re.sub(f"[^{allowed_characters}]", "", t) for t in text_easy]

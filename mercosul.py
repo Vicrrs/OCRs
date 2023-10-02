@@ -6,11 +6,11 @@ import re
 from scripts.preprocessing import *
 
 # Pasta de entrada com as imagens
-input_folder = r"/media/vicrrs/Novo volume/CILIA/IMAGENS_PLACA/warped-with-errors-v1.1/mercosul-v1"
+input_folder = r"/home/tkroza/Downloads/warped-with-errors-v1.1/antigo-v1"
 # Pasta para salvar os resultados do pytesseract
-pytesseract_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/PLACA MERCOSUL/PYTESSERACT"
+pytesseract_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/tesseract"
 # Pasta para salvar os resultados do easyocr
-easyocr_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/PLACA MERCOSUL/EASYOCR"
+easyocr_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/easy"
 
 # Lista de idiomas desejados para o easyocr
 easyocr_lang_list = ['pt']

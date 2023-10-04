@@ -5,12 +5,13 @@ import os
 import re
 from scripts.preprocessing import *
 
+
 # Pasta de entrada com as imagens
-input_folder = r"/home/tkroza/Downloads/warped-with-errors-v1.1/antigo-v1"
+input_folder = r"/media/vicrrs/Novo volume/CILIA/IMAGENS_PLACA/warped-with-errors-v1.1/antigo-v1"
 # Pasta para salvar os resultados do pytesseract
-pytesseract_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/tesseract"
+pytesseract_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/PLACA_ANTIGA/PYTESSERACT"
 # Pasta para salvar os resultados do easyocr
-easyocr_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/easy"
+easyocr_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/PLACA_ANTIGA/EASYOCR"
 
 # Lista de idiomas desejados para o easyocr
 easyocr_lang_list = ['pt']
@@ -35,21 +36,13 @@ mapeamento = {
 def extract_plate_from_text(text):
     cleaned_text = re.sub(r'[-;:.]', '', text)
     
-    match = re.search(r'([A-Za-z]{3}\d{4})', cleaned_text)
-    
-    if match:
-        return match.group(1).upper()  
-    else:
-        return ""
-
+    return cleaned_text[:3].upper()
 
 def substituir_caracteres(caractere):
     if caractere.isdigit():
         return mapeamento.get(caractere, caractere)
     elif caractere.isalpha():
-        for num, letra in mapeamento.items():
-            if letra == caractere.upper():
-                return num
+        return mapeamento.get(caractere.upper(), caractere)
     return caractere
 
 def converter_placa(placa):
@@ -69,13 +62,11 @@ def process_image(image_path):
 
     # Realiza OCR com pytesseract e easyocr
     text_py = ocr_plate(img_blur)  # Você pode escolher entre img_gray e img_blur
-    text_py = extract_plate_from_text(text_py)
     
     # Use pytesseract para filtrar apenas os caracteres permitidos
     text_py = re.sub(f"[^{allowed_characters}]", "", text_py)
 
     text_easy = ocr_with_easyocr(img_blur)  # Você pode escolher entre img_gray e img_blur
-    text_easy = [extract_plate_from_text(t) for t in text_easy]
 
     # Filtrar apenas os caracteres permitidos no texto do easyocr
     text_easy = [re.sub(f"[^{allowed_characters}]", "", t) for t in text_easy]
@@ -83,6 +74,10 @@ def process_image(image_path):
     # Realize o pós-processamento para garantir 3 letras e 4 números
     text_py = postprocess_text(text_py)
     text_easy = [postprocess_text(t) for t in text_easy]
+
+    # Converter o texto em maiúsculas antes de salvar
+    text_py = text_py.upper()
+    text_easy = [t.upper() for t in text_easy]
 
     # Extraia o nome do arquivo sem a extensão
     image_name = os.path.basename(image_path)
@@ -102,9 +97,9 @@ def postprocess_text(text):
     # Remova qualquer caractere que não seja uma letra ou um número
     filtered_text = ''.join(char for char in text if char.isalnum())
 
-    # Se o texto não tiver pelo menos 7 caracteres, retorne vazio
+    # Se o texto não tiver pelo menos 7 caracteres, mantenha-o inalterado
     if len(filtered_text) < 7:
-        return ""
+        return text
 
     # Pegue os três primeiros caracteres (letras) e os quatro últimos (números)
     letters = filtered_text[:3].upper()
@@ -114,6 +109,7 @@ def postprocess_text(text):
     formatted_placa = f"{letters}{numbers}"
 
     return formatted_placa
+
 
 if __name__ == "__main__":
     # Percorre os arquivos na pasta de entrada

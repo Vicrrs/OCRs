@@ -6,11 +6,11 @@ import re
 from scripts.preprocessing import *
 
 # Pasta de entrada com as imagens
-input_folder = r"/home/tkroza/Downloads/warped-with-errors-v1.1/antigo-v1"
+input_folder = r"/media/vicrrs/Novo volume/CILIA/IMAGENS_PLACA/warped-with-errors-v1.1/mercosul-v1"
 # Pasta para salvar os resultados do pytesseract
-pytesseract_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/tesseract"
+pytesseract_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/PLACA_MERCOSUL/PYTESSERACT"
 # Pasta para salvar os resultados do easyocr
-easyocr_output_folder = r"/home/tkroza/LAMIA/CILIA/code/OCRs/teste/antiga/easy"
+easyocr_output_folder = r"/media/vicrrs/Novo volume/CILIA/TXT/PLACA_MERCOSUL/EASYOCR"
 
 # Lista de idiomas desejados para o easyocr
 easyocr_lang_list = ['pt']
@@ -44,8 +44,13 @@ def process_image(image_path):
     text_easy = [re.sub(f"[^{allowed_characters}]", "", t) for t in text_easy]
 
     # Realize o pós-processamento para garantir a ordem "LETRA LETRA LETRA NUMERO LETRA NUMERO NUMERO"
+    # Realize o pós-processamento para garantir a ordem "LETRA LETRA LETRA NUMERO LETRA NUMERO NUMERO"
     text_py = postprocess_text(text_py)
     text_easy = [postprocess_text(t) for t in text_easy]
+
+    # Converter o texto em maiúsculas antes de salvar
+    text_py = text_py.upper()
+    text_easy = [t.upper() for t in text_easy]
 
     # Extraia o nome do arquivo sem a extensão
     image_name = os.path.basename(image_path)
@@ -67,7 +72,7 @@ def postprocess_text(text):
 
     # Se o texto for mais curto que 7 caracteres, retorne vazio
     if len(text) < 7:
-        return ""
+        return text
 
     # Reorganize o texto para a ordem "LETRA LETRA LETRA NUMERO LETRA NUMERO NUMERO"
     processed_text = (
